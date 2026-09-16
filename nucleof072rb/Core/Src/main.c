@@ -41,7 +41,7 @@
 
 /* USER CODE END PM */
 
-/* Private variables ---------------------------------------------------------*/
+/* Private variablesbles ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
 
@@ -55,6 +55,17 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+const uint8_t BUFFER_SIZE = 3;
+const uint8_t TIMEOUT = 100;
+const uint16_t PULSE_MIN = 2824;
+const uint16_t PULSE_MAX = 5647;
+
+uint8_t tx_buffer[BUFFER_SIZE] = {0x01, 0x80, 0x00};
+uint8_t rx_buffer[BUFFER_SIZE] = {};
+uint16_t pwm = 0;
+
+uint16_t adc_input = 0; // 10 bits
+
 
 /* USER CODE END 0 */
 
@@ -89,13 +100,30 @@ int main(void)
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
 
+  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_SET); // Chip Select
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    /* USER CODE END WHILE */
+	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_RESET);
+
+	  HAL_SPI_TransmitReceive(&hspi1, tx_buffer, rx_buffer, BUFFER_SIZE, TIMEOUT);
+
+	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_SET);
+
+
+	  adc_input = ((uint16_t)(rx_buffer[1] & 0x3) << 8 )| rx_buffer[2];
+	  pwm = PULSE_MIN + ((adc_input* (PULSE_MAX - PULSE_MIN)) / 1023);
+
+	  __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, pwm);
+
+
+	  HAL_Delay(10);
+	  /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
   }
