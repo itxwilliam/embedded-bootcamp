@@ -109,6 +109,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+    /* USER CODE END WHILE */
 	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_RESET);
 
 	  HAL_SPI_TransmitReceive(&hspi1, tx_buffer, rx_buffer, BUFFER_SIZE, TIMEOUT);
