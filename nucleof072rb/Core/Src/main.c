@@ -112,16 +112,23 @@ int main(void)
     /* USER CODE END WHILE */
 	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_RESET);
 
-	  HAL_SPI_TransmitReceive(&hspi1, tx_buffer, rx_buffer, BUFFER_SIZE, TIMEOUT);
+	  HAL_StatusTypeDef status = HAL_SPI_TransmitReceive(&hspi1, tx_buffer, rx_buffer, BUFFER_SIZE, TIMEOUT);
+	  if (status != HAL_OK ){
 
-	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_SET);
+		  char msg[] = "SPI Transmit Receive failed\r\n";
+		  HAL_UART_Transmit(&huart2, (uint8_t*)msg, sizeof(msg) - 1, TIMEOUT);
+		  Error_Handler();
 
+	  } else {
 
-	  adc_input = ((uint16_t)(rx_buffer[1] & 0x3) << 8 )| rx_buffer[2];
-	  pwm = PULSE_MIN + ((adc_input* (PULSE_MAX - PULSE_MIN)) / 1023);
+		  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_SET);
 
-	  __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, pwm);
+		  adc_input = ((uint16_t)(rx_buffer[1] & 0x3) << 8 )| rx_buffer[2];
+		  pwm = PULSE_MIN + ((adc_input* (PULSE_MAX - PULSE_MIN)) / 1023);
 
+		  __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, pwm);
+
+	  }
 
 	  HAL_Delay(10);
 	  /* USER CODE END WHILE */
