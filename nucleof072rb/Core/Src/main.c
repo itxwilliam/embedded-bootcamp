@@ -57,8 +57,8 @@ void SystemClock_Config(void);
 /* USER CODE BEGIN 0 */
 const uint8_t BUFFER_SIZE = 3;
 const uint8_t TIMEOUT = 100;
-const uint16_t PULSE_MIN = 2824;
-const uint16_t PULSE_MAX = 5647;
+const uint16_t PULSE_MIN = 3200;
+const uint16_t PULSE_MAX = 6400;
 
 uint8_t tx_buffer[BUFFER_SIZE] = {0x01, 0x80, 0x00};
 uint8_t rx_buffer[BUFFER_SIZE] = {};
